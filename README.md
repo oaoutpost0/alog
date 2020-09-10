@@ -1,6 +1,6 @@
 # alog
 
-ALog is a simplest form of leveled logger based on standard `log.Logger`.
+ALog is the simplest form of the leveled logger based on the standard `log.Logger`.
 
 ## Usage
 
@@ -73,7 +73,7 @@ func main() {
 
 ### Category Filtering
 
-Many other loggers called a `level`, but `alog` is calling it a `category`. All the built-in categories are available
+Many other loggers call it a `level`, but `alog` calls it a `category`. All the built-in categories are available
 with a prefix `alog.C_`.  
 
 ```go
@@ -95,9 +95,9 @@ func main() {
 
 ### Custom Category
 
-Category, unlike level, supports multiple different types together. For instance, 
+Categories, unlike levels, support multiple, different types together. For instance, 
 ErrSauce, ErrWing, ErrOrder are the 
-error codes, BadCustom, GoodCustomer are categories, 
+error codes; BadCustom, GoodCustomer are categories; and 
 HQ, Branch1, Branch2 are locations.
 Create whichever you want with `uint64` just like the example below.
 
