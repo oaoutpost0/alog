@@ -1,6 +1,7 @@
-# alog
+# aLog
 
-ALog is the simplest form of the leveled logger based on the standard `log.Logger`.
+aLog is the simplest form of the leveled logger based on the standard `log.Logger`.
+
 
 ## Usage
 
