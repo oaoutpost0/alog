@@ -45,7 +45,7 @@ const (
 	C_GLOBAL
 )
 
-type Alog struct {
+type ALogger struct {
 	mu         sync.Mutex
 	prefix     string
 	flagFormat FormatFlag
@@ -57,10 +57,10 @@ type Alog struct {
 	altOutput func(flagCat uint64, s string) error
 }
 
-type Opt func(*Alog)
+type Opt func(*ALogger)
 
-func New(opts ...Opt) *Alog {
-	l := &Alog{out: os.Stderr, prefix: "", flagFormat: F_TIME | F_PREFIX, flagCat: C_ALL,
+func New(opts ...Opt) *ALogger {
+	l := &ALogger{out: os.Stderr, prefix: "", flagFormat: F_TIME | F_PREFIX, flagCat: C_ALL,
 		altOutput: func(uint64, string) error { return nil },
 	}
 	for _, opt := range opts {
@@ -69,7 +69,7 @@ func New(opts ...Opt) *Alog {
 	return l
 }
 
-func (l *Alog) SetAltOutput(fnAltOut func(uint64, string) error) {
+func (l *ALogger) SetAltOutput(fnAltOut func(uint64, string) error) {
 	if fnAltOut == nil {
 		l.bAltOut = false
 		l.altOutput = func(uint64, string) error { return nil }
@@ -79,7 +79,7 @@ func (l *Alog) SetAltOutput(fnAltOut func(uint64, string) error) {
 	}
 }
 
-func (l *Alog) SetOutput(w io.Writer) {
+func (l *ALogger) SetOutput(w io.Writer) {
 	l.mu.Lock()
 	l.out = w
 	l.mu.Unlock()
@@ -99,7 +99,7 @@ func itoa(buf *[]byte, i int, wid int) {
 	*buf = append(*buf, b[bp:]...)
 }
 
-func (l *Alog) formatHeader(buf *[]byte, t time.Time) {
+func (l *ALogger) formatHeader(buf *[]byte, t time.Time) {
 	if l.flagFormat&(F_DATE|F_TIME|F_MICROSECONDS) != 0 {
 		if l.flagFormat&F_UTC != 0 {
 			t = t.UTC()
@@ -132,7 +132,7 @@ func (l *Alog) formatHeader(buf *[]byte, t time.Time) {
 	}
 }
 
-func (l *Alog) Output(flagCat uint64, s string) error {
+func (l *ALogger) Output(flagCat uint64, s string) error {
 	if l.flagCat&flagCat != 0 { // if category matches
 		if l.bAltOut {
 			return l.altOutput(flagCat, s)
@@ -154,7 +154,7 @@ func (l *Alog) Output(flagCat uint64, s string) error {
 }
 
 // Outputb is for exported writer as interface uses func([]byges)(int,error)
-func (l *Alog) Outputb(flagCat uint64, b []byte) error {
+func (l *ALogger) Outputb(flagCat uint64, b []byte) error {
 	if l.flagCat&flagCat != 0 { // if category matches
 		now := time.Now() // get this early.
 		l.mu.Lock()
@@ -172,70 +172,70 @@ func (l *Alog) Outputb(flagCat uint64, b []byte) error {
 }
 
 // ==================================================================== PRINT
-func (l *Alog) Print(flagCat uint64, s string)           { l.Output(flagCat, s) }
-func (l *Alog) Println(flagCat uint64, v ...interface{}) { l.Output(flagCat, fmt.Sprintln(v...)) }
-func (l *Alog) Printf(flagCat uint64, format string, v ...interface{}) {
+func (l *ALogger) Print(flagCat uint64, s string)           { l.Output(flagCat, s) }
+func (l *ALogger) Println(flagCat uint64, v ...interface{}) { l.Output(flagCat, fmt.Sprintln(v...)) }
+func (l *ALogger) Printf(flagCat uint64, format string, v ...interface{}) {
 	l.Output(flagCat, fmt.Sprintf(format, v...))
 }
 
 // ==================================================================== IFACE
-func (l *Alog) Debug(s string) {
+func (l *ALogger) Debug(s string) {
 	l.Output(C_DEBUG, s)
 }
-func (l *Alog) Debugf(f string, v ...interface{}) {
+func (l *ALogger) Debugf(f string, v ...interface{}) {
 	l.Output(C_DEBUG, fmt.Sprintf(f, v...))
 }
-func (l *Alog) Info(s string) {
+func (l *ALogger) Info(s string) {
 	l.Output(C_INFO, s)
 }
-func (l *Alog) Infof(f string, v ...interface{}) {
+func (l *ALogger) Infof(f string, v ...interface{}) {
 	l.Output(C_INFO, fmt.Sprintf(f, v...))
 }
-func (l *Alog) Warn(s string) {
+func (l *ALogger) Warn(s string) {
 	l.Output(C_WARN, s)
 }
-func (l *Alog) Warnf(f string, v ...interface{}) {
+func (l *ALogger) Warnf(f string, v ...interface{}) {
 	l.Output(C_WARN, fmt.Sprintf(f, v...))
 }
-func (l *Alog) Error(s string) {
+func (l *ALogger) Error(s string) {
 	l.Output(C_ERROR, s)
 }
-func (l *Alog) Errorf(f string, v ...interface{}) {
+func (l *ALogger) Errorf(f string, v ...interface{}) {
 	l.Output(C_ERROR, fmt.Sprintf(f, v...))
 }
 
 // ==================================================================== FATAL
-func (l *Alog) Fatal(flagCat uint64, s string) {
+func (l *ALogger) Fatal(flagCat uint64, s string) {
 	l.Output(flagCat, s)
 	os.Exit(1)
 }
-func (l *Alog) Fatalln(flagCat uint64, v ...interface{}) {
+func (l *ALogger) Fatalln(flagCat uint64, v ...interface{}) {
 	l.Output(flagCat, fmt.Sprintln(v...))
 	os.Exit(1)
 }
-func (l *Alog) Fatalf(flagCat uint64, format string, v ...interface{}) {
+func (l *ALogger) Fatalf(flagCat uint64, format string, v ...interface{}) {
 	l.Output(flagCat, fmt.Sprintf(format, v...))
 	os.Exit(1)
 }
 
 // ==================================================================== PANIC
-func (l *Alog) Panic(flagCat uint64, s string) {
+func (l *ALogger) Panic(flagCat uint64, s string) {
 	l.Output(flagCat, s)
 	panic(s)
 }
-func (l *Alog) Panicln(flagCat uint64, v ...interface{}) {
+func (l *ALogger) Panicln(flagCat uint64, v ...interface{}) {
 	s := fmt.Sprintln(v...)
 	l.Output(flagCat, s)
 	panic(s)
 }
-func (l *Alog) Panicf(flagCat uint64, format string, v ...interface{}) {
+func (l *ALogger) Panicf(flagCat uint64, format string, v ...interface{}) {
 	s := fmt.Sprintf(format, v...)
 	l.Output(flagCat, s)
 	panic(s)
 }
 
 // ==================================================================== FLAG
-func (l *Alog) SetFormat(flagFmt ...FormatFlag) {
+func (l *ALogger) SetFormat(flagFmt ...FormatFlag) {
 	var flag FormatFlag = 0
 	switch len(flagFmt) {
 	case 0:
@@ -251,7 +251,7 @@ func (l *Alog) SetFormat(flagFmt ...FormatFlag) {
 	l.flagFormat = flag
 	l.mu.Unlock()
 }
-func (l *Alog) SetFilter(category ...uint64) {
+func (l *ALogger) SetFilter(category ...uint64) {
 	var flag uint64 = 0
 
 	switch len(category) {
@@ -271,24 +271,24 @@ func (l *Alog) SetFilter(category ...uint64) {
 }
 
 // ==================================================================== PREFIX
-func (l *Alog) Prefix() string {
+func (l *ALogger) Prefix() string {
 	l.mu.Lock()
 	l.mu.Unlock()
 	return l.prefix
 }
-func (l *Alog) SetPrefix(prefix string) {
+func (l *ALogger) SetPrefix(prefix string) {
 	l.mu.Lock()
 	l.prefix = prefix
 	l.mu.Unlock()
 }
 
 // ==================================================================== WRITER
-func (l *Alog) Writer() io.Writer {
+func (l *ALogger) Writer() io.Writer {
 	l.mu.Lock()
 	defer l.mu.Unlock()
 	return l.out
 }
-func (l *Alog) NewWriter(flag uint64, prefix string) io.Writer {
+func (l *ALogger) NewWriter(flag uint64, prefix string) io.Writer {
 	if prefix != "" {
 		return &LogWriterPrefix{
 			alog:       l,
@@ -305,18 +305,18 @@ func (l *Alog) NewWriter(flag uint64, prefix string) io.Writer {
 }
 
 // ==================================================================== PRINT FUNC
-func (l *Alog) NewPrint(flagCat uint64) func(string) {
+func (l *ALogger) NewPrint(flagCat uint64) func(string) {
 	return func(s string) {
 		l.Output(flagCat, s)
 	}
 }
-func (l *Alog) NewPrintln(flagCat uint64) func(...interface{}) {
+func (l *ALogger) NewPrintln(flagCat uint64) func(...interface{}) {
 	return func(v ...interface{}) {
 		l.Output(flagCat, fmt.Sprint(v...))
 	}
 }
 
-func (l *Alog) NewPrintf(flagCat uint64) func(string, ...interface{}) {
+func (l *ALogger) NewPrintf(flagCat uint64) func(string, ...interface{}) {
 	return func(s string, v ...interface{}) {
 		l.Output(flagCat, fmt.Sprintf(s, v...))
 	}
@@ -333,7 +333,7 @@ func (devNull) Write(p []byte) (int, error) {
 
 // ==================================================================== WRITER
 type LogWriter struct {
-	alog    *Alog
+	alog    *ALogger
 	flagCat uint64
 }
 
@@ -344,7 +344,7 @@ func (dw *LogWriter) Write(p []byte) (n int, err error) {
 
 // ==================================================================== WRITER: PREFIX
 type LogWriterPrefix struct {
-	alog       *Alog
+	alog       *ALogger
 	flagCat    uint64
 	prefix     []byte
 	prefixSize int
@@ -361,7 +361,7 @@ func (dw *LogWriterPrefix) Write(p []byte) (n int, err error) {
 }
 
 // ==================================================================== GLOBAL
-var std = New(func(l *Alog) {
+var std = New(func(l *ALogger) {
 	l.SetFilter(C_ALL)
 	l.SetFormat()
 	l.SetOutput(os.Stderr)

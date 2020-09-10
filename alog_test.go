@@ -12,7 +12,7 @@ import (
 	"github.com/orangenumber/alog"
 )
 
-func TestAlog(t *testing.T) {
+func TestALog(t *testing.T) {
 	buf := bytes.Buffer{}
 
 	alog.SetOutput(&buf)
@@ -33,7 +33,7 @@ func TestAlog(t *testing.T) {
 	}
 }
 
-func TestNewAlog(t *testing.T) {
+func TestNewALog(t *testing.T) {
 	buf := bytes.Buffer{}
 
 	l := alog.New()
@@ -62,7 +62,7 @@ func TestNewAlog(t *testing.T) {
 	}
 }
 
-func TestAlogNewPrint(t *testing.T) {
+func TestALogNewPrint(t *testing.T) {
 	buf := bytes.Buffer{}
 	alog.SetOutput(&buf)
 	alog.SetFormat(0)
@@ -96,7 +96,7 @@ func TestAlogNewPrint(t *testing.T) {
 	}
 }
 
-func TestNewAlogNewWriter(t *testing.T) {
+func TestNewALogNewWriter(t *testing.T) {
 	buf := bytes.Buffer{}
 	l := alog.New()
 	l.SetOutput(&buf)
@@ -142,7 +142,7 @@ func Benchmark_NewStdLog_Output(b *testing.B) {
 		// l.Print(data.ID)
 	}
 }
-func Benchmark_NewAlog_Output(b *testing.B) {
+func Benchmark_NewALog_Output(b *testing.B) {
 	data := outsideData(b) // GET DATA FROM OUTSIDE..
 	b.ResetTimer()
 	b.ReportAllocs()
@@ -155,7 +155,7 @@ func Benchmark_NewAlog_Output(b *testing.B) {
 		l.Output(alog.C_ALL, data.ID)
 	}
 }
-func Benchmark_NewAlog_Print(b *testing.B) {
+func Benchmark_NewALog_Print(b *testing.B) {
 	data := outsideData(b) // GET DATA FROM OUTSIDE..
 	b.ResetTimer()
 	b.ReportAllocs()
@@ -180,7 +180,7 @@ func Benchmark_NewStdLog_Print(b *testing.B) {
 	}
 }
 
-func Benchmark_NewAlog_Print_Filtered(b *testing.B) {
+func Benchmark_NewALog_Print_Filtered(b *testing.B) {
 	data := outsideData(b) // GET DATA FROM OUTSIDE..
 	b.ResetTimer()
 	b.ReportAllocs()
@@ -194,7 +194,7 @@ func Benchmark_NewAlog_Print_Filtered(b *testing.B) {
 	}
 }
 
-func Benchmark_NewAlog_Errorf(b *testing.B) {
+func Benchmark_NewALog_Errorf(b *testing.B) {
 	data := outsideData(b) // GET DATA FROM OUTSIDE..
 	b.ResetTimer()
 	b.ReportAllocs()
@@ -219,7 +219,7 @@ func Benchmark_NewStdLog_Printf(b *testing.B) {
 	}
 }
 
-func Benchmark_NewAlog_NewPrint(b *testing.B) {
+func Benchmark_NewALog_NewPrint(b *testing.B) {
 	data := outsideData(b) // GET DATA FROM OUTSIDE..
 	b.ResetTimer()
 	b.ReportAllocs()
@@ -237,11 +237,14 @@ func Benchmark_NewAlog_NewPrint(b *testing.B) {
 }
 
 func Benchmark_Test(b *testing.B) {
+	out := []string{"test", "this", "is", "good"}
+	// out2 := "testa"
 	b.ResetTimer()
 	b.ReportAllocs()
 
 	for n := 0; n < b.N; n++ {
 		// l.Print(dl.C_IO, data.ID)
-		fmt.Sprint("test")
+		fmt.Sprint(out)
+		// test1(alog.Discard, out2, out2)
 	}
 }
